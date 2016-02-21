@@ -1,6 +1,6 @@
-package parser;
+package main.java.parser;
 
-import api.Parser;
+import main.java.api.ParserService;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by user on 2016-02-10.
  */
-public class ParserImpl implements Parser {
+public class ParserServiceImpl implements ParserService {
     public List<String> parseTitles(Elements headlines, List<String> titles) {
         for (Element headline : headlines) {
             String s = headline.text().replace("Permalink", "");
