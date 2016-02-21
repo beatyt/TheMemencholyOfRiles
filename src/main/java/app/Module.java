@@ -22,8 +22,8 @@ import java.util.*;
  * Created by user on 2016-02-10.
  */
 
-public class Application extends AbstractModule {
-    private static final Logger logger = LogManager.getLogger(Application.class);
+public class Module extends AbstractModule {
+    private static final Logger logger = LogManager.getLogger(Module.class);
     private ScraperService scraperService;
     private ParserService parserService;
     private StorageService storageService;
@@ -49,7 +49,8 @@ public class Application extends AbstractModule {
     }
 
     public void theThing() throws IOException, InterruptedException {
-        logger.info("Application is running.");
+        // TODO: Refactor theThing() into better parse, scrape, and store methods
+        logger.info("Module is running.");
         String dataFile = PropertyHandler.getInstance().getValue("dataFile");
         String baseUrl = PropertyHandler.getInstance().getValue("baseUrl");
         String saveToFileName = PropertyHandler.getInstance().getValue("saveToFileName");
@@ -69,7 +70,7 @@ public class Application extends AbstractModule {
             storageService.saveFile(titles,saveToFileName);
             Thread.sleep(1000);
         }
-        logger.info("Application is done.");
+        logger.info("Module is done.");
     }
 
     public void copyToClipboard(String toCopy) {

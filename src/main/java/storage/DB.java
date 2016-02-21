@@ -12,7 +12,7 @@ public class DB {
         Connection connection = null;
         try {
             // the postgresql driver string
-            Class.forName("org.postgresql.Driver");
+            Class.forName("org.postgresql.StartupHandler");
 
             // the postgresql url
             String url = "jdbc:postgresql://THE_HOST/THE_DATABASE";
