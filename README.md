@@ -1,5 +1,20 @@
 # TheMemencholyOfRiles
-A utility to fetch, parse, and store headlines from the perezhilton website in the pursuit of memes.
+
+A utility to fetch, parse, and store data from a website.
+
+# Backstory
+
+Riles once quizzed me on pop figures.  I knew nothing.
+
+So, Riles began posting news headlines into all chat during our Dota 2 games.
+
+Then, he started replacing celebrity's names with mine.
+
+That meant war, and here we are.  I saw a possibility to automate the process such that Riles has been unable to keep up with the memes.
+
+# Quickstart:
+
+Edit the config.properties file to add your own url and data files.  Data files are found in the target/classes/data directory.
 
 # How to deploy:
 
