@@ -11,4 +11,5 @@ public interface StorageService {
     public String retrieveEntry();
     public List<String> loadFile(String path) throws IOException;
     public void saveFile(List<String> contents, String filename) throws IOException;
+    public void appendLineToFile(String contents, String fileName) throws IOException;
 }

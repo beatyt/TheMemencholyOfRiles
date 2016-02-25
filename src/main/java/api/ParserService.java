@@ -8,6 +8,6 @@ import java.util.List;
  * Created by user on 2016-02-10.
  */
 public interface ParserService {
-    public List<String> parseTitles(Elements headlines, List<String> titles);
-    public List<String> parseDict(List<String> titles, List<String> names);
+    public String parseTitle(String headline);
+    public String parseDict(String title, List<String> checkAgainst);
 }

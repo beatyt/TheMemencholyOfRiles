@@ -20,7 +20,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public void storeEntry(String entry) {
-
+        System.out.println(entry);
     }
 
     @Override
@@ -49,6 +49,27 @@ public class StorageServiceImpl implements StorageService {
         }
 //        printList(contents);
     }
+
+    @Override
+    public void appendLineToFile(String contents, String fileName) throws IOException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("data/" + fileName).getPath());
+        logger.info("Writing to file: " + file.getAbsolutePath());
+        // TODO:  refactor using streams or something java 8?
+        List<String> checkAgainst = loadFile(fileName);
+        boolean addTheLine = true;
+            for (String check : checkAgainst) {
+                if (contents.equals(check)) {
+                    addTheLine = false;
+                }
+            }
+            if (addTheLine) {
+                FileUtils.writeStringToFile(file, contents + "\r\n", true);
+                logger.debug("[Adding] " + contents);
+            }
+//        printList(contents);
+    }
+
     public List<String> loadFile(String fileName) throws IOException {
         List<String> names = new ArrayList<String>();
         String path = "data/" + fileName;
