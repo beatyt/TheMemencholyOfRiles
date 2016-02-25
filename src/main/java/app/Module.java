@@ -17,13 +17,15 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by user on 2016-02-10.
  */
 
-public class Application extends AbstractModule {
-    private static final Logger logger = LogManager.getLogger(Application.class);
+public class Module extends AbstractModule {
+    private static final Logger logger = LogManager.getLogger(Module.class);
     private ScraperService scraperService;
     private ParserService parserService;
     private StorageService storageService;
@@ -37,7 +39,7 @@ public class Application extends AbstractModule {
         this.parserService = parserService;
     }
     @Inject
-    public void setScraper(StorageService storageService) {
+    public void setStorage(StorageService storageService) {
         this.storageService = storageService;
     }
 
@@ -49,27 +51,11 @@ public class Application extends AbstractModule {
     }
 
     public void theThing() throws IOException, InterruptedException {
-        logger.info("Application is running.");
-        String dataFile = PropertyHandler.getInstance().getValue("dataFile");
-        String baseUrl = PropertyHandler.getInstance().getValue("baseUrl");
-        String saveToFileName = PropertyHandler.getInstance().getValue("saveToFileName");
-        java.util.List<String> names = new ArrayList<String>();
 
-        Elements headlines = null;
-        int count = 1;
-        while (count < 10) {
-            // TODO: make main.java.parser and main.java.scraper run in parallel with that dish washer and cleaner design pattern
-            String url = baseUrl + count;
-            headlines = scraperService.fetchContent(url, "body a[rel=bookmark]");
-            java.util.List<String> titles = new ArrayList<String>();
-            titles = parserService.parseTitles(headlines, titles);
-            names = storageService.loadFile(dataFile);
-            titles = parserService.parseDict(titles, names);
-            count++;
-            storageService.saveFile(titles,saveToFileName);
-            Thread.sleep(1000);
-        }
-        logger.info("Application is done.");
+        String saveToFileName = PropertyHandler.getInstance().getValue("saveToFileName");
+
+        BlockingQueue sharedQueue = new LinkedBlockingQueue();
+
     }
 
     public void copyToClipboard(String toCopy) {

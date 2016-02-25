@@ -27,3 +27,8 @@ Edit the config.properties file to add your own url and data files.  Some data f
 2. Git clone this into that new project directory
 3. Do the stuff for the pom.xml (mvn install????) to get the dependencies.
 4. /\/\e/\/\e
+
+## Design patterns:
+
+1. Singleton -- The PropertyHandler utilizes the Singleton pattern so that one instance of the configuration file will exist.
+2. ~Planned~ Producer-Consumer -- Multithreaded queue for the scraping and parsing

@@ -1,16 +1,13 @@
 package main.java.storage;
 
 import main.java.api.StorageService;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +20,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public void storeEntry(String entry) {
-
+        System.out.println(entry);
     }
 
     @Override
@@ -52,6 +49,27 @@ public class StorageServiceImpl implements StorageService {
         }
 //        printList(contents);
     }
+
+    @Override
+    public void appendLineToFile(String contents, String fileName) throws IOException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("data/" + fileName).getPath());
+        logger.info("Writing to file: " + file.getAbsolutePath());
+        // TODO:  refactor using streams or something java 8?
+        List<String> checkAgainst = loadFile(fileName);
+        boolean addTheLine = true;
+            for (String check : checkAgainst) {
+                if (contents.equals(check)) {
+                    addTheLine = false;
+                }
+            }
+            if (addTheLine) {
+                FileUtils.writeStringToFile(file, contents + "\r\n", true);
+                logger.debug("[Adding] " + contents);
+            }
+//        printList(contents);
+    }
+
     public List<String> loadFile(String fileName) throws IOException {
         List<String> names = new ArrayList<String>();
         String path = "data/" + fileName;
@@ -94,14 +112,5 @@ public class StorageServiceImpl implements StorageService {
             System.out.println(t);
         }
     }
-    public void testConnection() {
-        MongoClient mongoClient = new MongoClient();
-        DB db = mongoClient.getDB("test");
-        DBCollection coll = db.getCollection("headlines");
-        BasicDBObject doc = new BasicDBObject("name", "MongoDB")
-                .append("type", "database")
-                .append("count", 1)
-                .append("info", new BasicDBObject("x", 203).append("y", 102));
-        coll.insert(doc);
-    }
+
 }
