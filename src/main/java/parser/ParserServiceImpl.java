@@ -55,7 +55,7 @@ public class ParserServiceImpl implements ParserService, Callable<Void> {
             // TODO:  Does this need to go outside the loop?  Or does it need to work on batch for the queue?
             return fixedTitle;
         }
-        return null;
+        return ""; // null broke the stack
     }
 
     @Override
@@ -64,6 +64,7 @@ public class ParserServiceImpl implements ParserService, Callable<Void> {
         try {
             Element data = (Element) queue.get();
             while (queue.continueProducing || data != null) {
+                logger.info("Processing: " + data);
                 data = (Element) queue.get();
                 String title = parseTitle(data.text());
                 List<String> checkAgainst = storageService.loadFile(dataFile);
