@@ -59,19 +59,24 @@ public class StartupHandler extends Application{
         File dataFile = new File(System.getProperty("user.dir") +
                 "\\target\\classes\\data\\" +
                 PropertyHandler.getInstance().getValue("saveToFileName"));
+
         Label errMsg = new Label("Copy autocopies lines to your clipboard =)");
         errMsg.setFont(Font.font("Arial", FontWeight.BOLD, 14));
         errMsg.setTextFill(Color.WHITE);
 
-        TextArea textField = new TextArea();
-        textField.setWrapText(true);
+        TextArea textArea = new TextArea();
+        textArea.setWrapText(true);
+        textArea.setPrefRowCount(30);
 
         VBox vbox = new VBox();
         vbox.setPadding(new Insets(10));
         vbox.setSpacing(10);
         vbox.setStyle("-fx-background-color: #336699;");
 
+        vbox.getChildren().addAll(errMsg, textArea);
+
         HBox hbox = new HBox();
+        hbox.setPadding(new Insets(10));
         hbox.setSpacing(10);
 
         Button fetchBtn = new Button("Fetch");
@@ -91,18 +96,26 @@ public class StartupHandler extends Application{
                     logger.info("The dataFile was not found.");
                     errMsg.setText("The dataFile was not found.");
                 } else {
+                    String lines = "";
                     String[] linesInFile = contents.split("\r\n");
+                    for (int i = 0; i < 9; i++) {
+                        String copyString = linesInFile[(int)(Math.random()*linesInFile.length)];
+                        lines += copyString + "\n\n";
+                    }
                     String copyString = linesInFile[(int)(Math.random()*linesInFile.length)];
+                    textArea.setText(lines);
                     copyToClipboard(copyString);
-                    textField.setText(copyString);
+
                 }
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
 
         });
-        vbox.getChildren().addAll(errMsg, textField);
+
+
         hbox.getChildren().addAll(fetchBtn, copyBtn);
+
         BorderPane myPane = new BorderPane();
         myPane.setTop(vbox);
         myPane.setCenter(hbox);
@@ -111,7 +124,7 @@ public class StartupHandler extends Application{
 
         primaryStage.setScene(myScene);
         primaryStage.setWidth(400);
-        primaryStage.setHeight(300);
+        primaryStage.setHeight(700);
         primaryStage.show();
 
     }
