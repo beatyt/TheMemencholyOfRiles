@@ -5,16 +5,13 @@ import main.java.api.ParserService;
 import main.java.api.StorageService;
 import main.java.app.MySharedQueue;
 import main.java.app.PropertyHandler;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -39,14 +36,16 @@ public class ParserServiceImpl implements ParserService, Callable<Void> {
         }
         return null;
     }
-    public String parseDict(String title, List<String> names) {
+    public String parseDict(String title, LinkedHashSet names) {
         String fixedTitle = title;
-            for (String name : names) {
-                // Quit once we find one match
-                if (fixedTitle.contains(name)) {
-                    fixedTitle = fixedTitle.replaceFirst(name, "Riles");
-                    break;
-                }
+        Iterator<String> nameIter = names.iterator();
+        while (nameIter.hasNext()) {
+            String name = nameIter.next();
+            // Quit once we find one match
+            if (fixedTitle.contains(name)) {
+                fixedTitle = fixedTitle.replaceFirst(name, "Riles");
+                break;
+            }
         }
         fixedTitle = fixedTitle.replace("Her", "His");
         fixedTitle = fixedTitle.replace("She", "He");
@@ -67,10 +66,9 @@ public class ParserServiceImpl implements ParserService, Callable<Void> {
                 logger.info("Processing: " + data);
                 data = (Element) queue.get();
                 String title = parseTitle(data.text());
-                List<String> checkAgainst = storageService.loadFile(dataFile);
-                List<String> dedupedList =
-                        new ArrayList<>(new LinkedHashSet<>(checkAgainst));
-                String parsedTitle = parseDict(title, dedupedList);
+                LinkedHashSet<String> checkAgainst = storageService.loadFile(dataFile);
+//                LinkedHashSet dedupedList = new LinkedHashSet<>(checkAgainst);
+                String parsedTitle = parseDict(title, checkAgainst);
                 logger.info("Finished processing: " + parsedTitle);
 //                storageService.storeEntry(parsedTitle);
                 storageService.appendLineToFile(parsedTitle, "Riles.txt");

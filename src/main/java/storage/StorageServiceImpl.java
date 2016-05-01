@@ -8,8 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by user on 2016-02-10.
@@ -29,14 +28,16 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public void saveFile(List<String> contents, String fileName) throws IOException {
+    public void saveFile(LinkedHashSet contents, String fileName) throws IOException {
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("data/" + fileName).getPath());
         logger.info("Writing to file: " + file.getAbsolutePath());
         // TODO:  refactor using streams or something java 8?
-        List<String> checkAgainst = loadFile(fileName);
+        LinkedHashSet<String> checkAgainst = loadFile(fileName);
         boolean addTheLine = true;
-        for (String s : contents) {
+        Iterator<String> nameIter = contents.iterator();
+        while (nameIter.hasNext()) {
+            String s = nameIter.next();
             for (String check : checkAgainst) {
                 if (s.equals(check)) {
                     addTheLine = false;
@@ -47,7 +48,6 @@ public class StorageServiceImpl implements StorageService {
                 logger.debug("[Adding] " + s);
             }
         }
-//        printList(contents);
     }
 
     @Override
@@ -56,22 +56,22 @@ public class StorageServiceImpl implements StorageService {
         File file = new File(classLoader.getResource("data/" + fileName).getPath());
         logger.info("Writing to file: " + file.getAbsolutePath());
         // TODO:  refactor using streams or something java 8?
-        List<String> checkAgainst = loadFile(fileName);
+        LinkedHashSet<String> checkAgainst = loadFile(fileName);
         boolean addTheLine = true;
             for (String check : checkAgainst) {
                 if (contents.equals(check)) {
                     addTheLine = false;
                 }
             }
-            if (addTheLine) {
+            if (addTheLine &&
+                    "" != contents &&
+                    contents.length() > 10) {
                 FileUtils.writeStringToFile(file, contents + "\r\n", true);
-                logger.debug("[Adding] " + contents);
+                logger.debug("Writing line:   " + contents);
             }
-//        printList(contents);
     }
 
-    public List<String> loadFile(String fileName) throws IOException {
-        List<String> names = new ArrayList<String>();
+    public LinkedHashSet loadFile(String fileName) throws IOException {
         String path = "data/" + fileName;
 //        String fileContents = getFile("data/" + fileName); pretty cool stuff.. gets file contents as a String
         return getFileLinesAsList(path);
@@ -92,25 +92,20 @@ public class StorageServiceImpl implements StorageService {
 
     }
 
-    private List<String> getFileLinesAsList(String fileName){
+    private LinkedHashSet getFileLinesAsList(String fileName){
 
         List<String> result = null;
-
+        LinkedHashSet resultSet = null;
         ClassLoader classLoader = getClass().getClassLoader();
         try {
             result = IOUtils.readLines(classLoader.getResourceAsStream(fileName));
+            resultSet = new LinkedHashSet(result);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return result;
+        return resultSet;
 
-    }
-
-    public static void printList(List<String> list) {
-        for (String t : list) {
-            System.out.println(t);
-        }
     }
 
 }
