@@ -39,13 +39,13 @@ public class StartupHandler extends Application{
         ParserService parserService = injector.getInstance(ParserService.class);
         StorageService storageService = injector.getInstance(StorageService.class);
         MySharedQueue queue = injector.getInstance(MySharedQueue.class);
-        String debug = PropertyHandler.getInstance().getValue("debug");
+        String useGui = PropertyHandler.getInstance().getValue("useGui");
 
         LocalDateTime startTime = LocalDateTime.now();
         logger.info("Starting at: " + startTime);
         Module app = injector.getInstance(Module.class);
 
-        if (debug.equals("true")) {
+        if (useGui.equals("true")) {
             launch(args);
         }
         else {
