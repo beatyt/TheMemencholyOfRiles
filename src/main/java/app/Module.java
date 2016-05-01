@@ -17,8 +17,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 
 /**
  * Created by user on 2016-02-10.
@@ -50,19 +49,19 @@ public class Module extends AbstractModule {
         bind(StorageService.class).to(StorageServiceImpl.class);
     }
 
-    public void theThing() throws IOException, InterruptedException {
-
+    public void start() throws IOException, InterruptedException {
         String saveToFileName = PropertyHandler.getInstance().getValue("saveToFileName");
+//        BlockingQueue sharedQueue = new LinkedBlockingQueue();
+        final int NTHREADS = 25;
+        final ExecutorService exec =
+                Executors.newFixedThreadPool(NTHREADS);
 
-        BlockingQueue sharedQueue = new LinkedBlockingQueue();
-
+        /* These statements will start the app */
+        exec.submit((Callable<Object>) parserService);
+        exec.submit((Callable<Object>) scraperService);
     }
 
-    public void copyToClipboard(String toCopy) {
-        StringSelection stringSelection = new StringSelection(toCopy);
-        Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clpbrd.setContents(stringSelection, null);
-    }
+
 
     public java.util.List<String> pickNRandom(java.util.List<String> lst, int n) {
         java.util.List<String> copy = new LinkedList<String>(lst);
