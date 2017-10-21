@@ -1,7 +1,3 @@
-# TheMemencholyOfRiles
-
-A utility to fetch, parse, and store data from a website.
-
 ### Status
 
 [![Build Status](https://travis-ci.org/beatyt/TheMemencholyOfRiles.svg?branch=master)](https://travis-ci.org/beatyt/TheMemencholyOfRiles)
@@ -30,5 +26,5 @@ Edit the config.properties file to add your own url and data files.  Some data f
 
 ## Design patterns:
 
-1. Singleton -- The PropertyHandler utilizes the Singleton pattern so that one instance of the configuration file will exist.
-2. ~Planned~ Producer-Consumer -- Multithreaded queue for the scraping and parsing
+1. Singleton -- The PropertyHandler utilizes the Singleton pattern so that one instance of the configuration file will exist.  MySharedQueue uses the pattern as well.
+2. Producer-Consumer -- Multithreaded queue for the scraping and parsing.

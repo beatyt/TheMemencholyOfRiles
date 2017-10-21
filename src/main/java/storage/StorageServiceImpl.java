@@ -1,6 +1,6 @@
-package main.java.storage;
+package storage;
 
-import main.java.api.StorageService;
+import api.StorageService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;

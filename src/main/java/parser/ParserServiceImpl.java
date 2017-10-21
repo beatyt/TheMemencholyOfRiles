@@ -1,10 +1,10 @@
-package main.java.parser;
+package parser;
 
 import com.google.inject.Inject;
-import main.java.api.ParserService;
-import main.java.api.StorageService;
-import main.java.app.MySharedQueue;
-import main.java.app.PropertyHandler;
+import api.ParserService;
+import api.StorageService;
+import app.MySharedQueue;
+import app.PropertyHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;

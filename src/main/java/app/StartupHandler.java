@@ -1,4 +1,4 @@
-package main.java.app;
+package app;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -8,9 +8,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import main.java.api.ParserService;
-import main.java.api.ScraperService;
-import main.java.api.StorageService;
+import api.ParserService;
+import api.ScraperService;
+import api.StorageService;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.apache.logging.log4j.LogManager;
@@ -41,12 +41,11 @@ public class StartupHandler extends Application{
         LocalDateTime startTime = LocalDateTime.now();
         logger.info("Starting at: " + startTime);
         Module app = injector.getInstance(Module.class);
-//        launch(args);
-//        app.theThing();
 
-//        storageService.testConnection();
-
-
+        if (args[1].equals("gui")) {
+            launch(args);
+            app.theThing();
+        }
     }
 
 

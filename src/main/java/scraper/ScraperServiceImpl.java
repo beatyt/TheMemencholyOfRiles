@@ -1,9 +1,9 @@
-package main.java.scraper;
+package scraper;
 
 import com.google.inject.Inject;
-import main.java.api.ScraperService;
-import main.java.app.MySharedQueue;
-import main.java.app.PropertyHandler;
+import api.ScraperService;
+import app.MySharedQueue;
+import app.PropertyHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;

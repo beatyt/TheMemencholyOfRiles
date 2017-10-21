@@ -1,6 +1,6 @@
-package main.java.app;
+package app;
 
-import main.java.api.Configuration;
+import api.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

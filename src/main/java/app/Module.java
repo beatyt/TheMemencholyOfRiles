@@ -1,16 +1,16 @@
-package main.java.app;
+package app;
 
-import main.java.api.ParserService;
-import main.java.api.ScraperService;
-import main.java.api.StorageService;
+import api.ParserService;
+import api.ScraperService;
+import api.StorageService;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import main.java.storage.StorageServiceImpl;
+import storage.StorageServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.select.Elements;
-import main.java.parser.ParserServiceImpl;
-import main.java.scraper.ScraperServiceImpl;
+import parser.ParserServiceImpl;
+import scraper.ScraperServiceImpl;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;

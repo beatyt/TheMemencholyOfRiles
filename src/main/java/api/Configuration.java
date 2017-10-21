@@ -1,4 +1,4 @@
-package main.java.api;
+package api;
 
 /**
  * Created by user on 2016-02-20.
