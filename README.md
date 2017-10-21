@@ -4,13 +4,13 @@
 
 ## Backstory
 
-Riles once quizzed me on pop figures.  I knew nothing.
+Riles once quizzed Tom on pop figure trivia.  Tom knew nothing.
 
-So, Riles began posting news headlines into all chat during our Dota 2 games.
+So, Riles began posting news headlines into all chat during Dota 2 games.
 
-Then, he started replacing celebrity's names with mine.
+Then, he started replacing celebrity's names with Tom's.
 
-That meant war, and here we are.  I saw a possibility to automate the process such that Riles has been unable to keep up with the memes.
+Seeing the opportunity for automation, Tom constructed an application for fetching and parsing headlines.
 
 ## Quickstart:
 
