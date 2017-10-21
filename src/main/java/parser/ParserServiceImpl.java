@@ -1,17 +1,16 @@
 package parser;
 
-import com.google.inject.Inject;
 import api.ParserService;
 import api.StorageService;
 import app.MySharedQueue;
 import app.PropertyHandler;
-import org.apache.commons.io.FileUtils;
+import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -32,6 +31,7 @@ public class ParserServiceImpl implements ParserService, Callable<Void> {
     @Inject
     private MySharedQueue queue;
 
+    @Override
     public String parseTitle(String headline) {
         String title = headline.replace("Permalink", "");
         if (!"".equals(title)) {
@@ -39,6 +39,8 @@ public class ParserServiceImpl implements ParserService, Callable<Void> {
         }
         return null;
     }
+
+    @Override
     public String parseDict(String title, List<String> names) {
         String fixedTitle = title;
             for (String name : names) {
@@ -59,7 +61,7 @@ public class ParserServiceImpl implements ParserService, Callable<Void> {
     }
 
     @Override
-    public Void call() throws Exception {
+    public Void call() throws IOException {
         String dataFile = PropertyHandler.getInstance().getValue("dataFile");
         try {
             Element data = (Element) queue.get();
