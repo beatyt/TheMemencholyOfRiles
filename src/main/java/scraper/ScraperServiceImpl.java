@@ -39,6 +39,7 @@ public class ScraperServiceImpl implements ScraperService, Callable<Void> {
         String urlPageSuffix = PropertyHandler.getInstance().getValue("urlPageSuffix");
         String numberOfPages = PropertyHandler.getInstance().getValue("numberOfPages");
         String tagToParse = PropertyHandler.getInstance().getValue("tagToParse");
+        String debug = PropertyHandler.getInstance().getValue("debug");
 
         assert(numberOfPages.matches("^-?\\d+$")); // make sure someone supplied only numbers
 
@@ -47,11 +48,18 @@ public class ScraperServiceImpl implements ScraperService, Callable<Void> {
         try {
             for (int i = 0; i < goal; i++) {
                 String url = baseUrl + urlPageSuffix + i;
-                headlines = fetchContent(url, tagToParse);
+                if (debug.equals("true")) {
+
+                }
+                else {
+                    headlines = fetchContent(url, tagToParse);
+                }
                 Spliterator<Element> elementSpliterator = headlines.spliterator().trySplit();
                 elementSpliterator.forEachRemaining(headline -> {
                     try {
-                        if (!headline.text().toLowerCase().contains("permalink")) {
+                        if (!headline.text().toLowerCase().contains("permalink")
+                                && ""   != headline.text()
+                                && null != headline.text()) {
                             logger.info("Produced: " + headline);
                             queue.put(headline);
                         }

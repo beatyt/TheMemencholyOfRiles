@@ -10,11 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Element;
-
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -42,14 +40,16 @@ public class ParserServiceImpl implements ParserService, Callable<Void> {
     }
 
     @Override
-    public String parseDict(String title, List<String> names) {
+    public String parseDict(String title, LinkedHashSet names) {
         String fixedTitle = title;
-            for (String name : names) {
-                // Quit once we find one match
-                if (fixedTitle.contains(name)) {
-                    fixedTitle = fixedTitle.replaceFirst(name, "Riles");
-                    break;
-                }
+        Iterator<String> nameIter = names.iterator();
+        while (nameIter.hasNext()) {
+            String name = nameIter.next();
+            // Quit once we find one match
+            if (fixedTitle.contains(name)) {
+                fixedTitle = fixedTitle.replaceFirst(name, "Riles");
+                break;
+            }
         }
         if (Configuration.OPTIONS.USE_GENDER_MALE.isEnabled()) {
             fixedTitle = fixedTitle.replace("Her", "His");
@@ -60,7 +60,7 @@ public class ParserServiceImpl implements ParserService, Callable<Void> {
             // TODO:  Does this need to go outside the loop?  Or does it need to work on batch for the queue?
             return fixedTitle;
         }
-        return null;
+        return ""; // null broke the stack
     }
 
     @Override
@@ -69,12 +69,12 @@ public class ParserServiceImpl implements ParserService, Callable<Void> {
         try {
             Element data = (Element) queue.get();
             while (queue.continueProducing || data != null) {
+                logger.info("Processing: " + data);
                 data = (Element) queue.get();
                 String title = parseTitle(data.text());
-                List<String> checkAgainst = storageService.loadFile(dataFile);
-                List<String> dedupedList =
-                        new ArrayList<>(new LinkedHashSet<>(checkAgainst));
-                String parsedTitle = parseDict(title, dedupedList);
+                LinkedHashSet<String> checkAgainst = storageService.loadFile(dataFile);
+//                LinkedHashSet dedupedList = new LinkedHashSet<>(checkAgainst);
+                String parsedTitle = parseDict(title, checkAgainst);
                 logger.info("Finished processing: " + parsedTitle);
 //                storageService.storeEntry(parsedTitle);
                 storageService.appendLineToFile(parsedTitle, "Riles.txt");
