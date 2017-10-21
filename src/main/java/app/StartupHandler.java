@@ -1,5 +1,6 @@
 package app;
 
+import api.Configuration;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -31,6 +32,8 @@ public class StartupHandler extends Application{
         ParserService parserService = injector.getInstance(ParserService.class);
         StorageService storageService = injector.getInstance(StorageService.class);
         MySharedQueue queue = injector.getInstance(MySharedQueue.class);
+
+        Configuration.OPTIONS.USE_GENDER_MALE.setOption(true);
 
         final int NTHREADS = 25;
         final ExecutorService exec =

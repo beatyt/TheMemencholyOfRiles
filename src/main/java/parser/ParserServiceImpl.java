@@ -1,5 +1,6 @@
 package parser;
 
+import api.Configuration;
 import api.ParserService;
 import api.StorageService;
 import app.MySharedQueue;
@@ -50,8 +51,10 @@ public class ParserServiceImpl implements ParserService, Callable<Void> {
                     break;
                 }
         }
-        fixedTitle = fixedTitle.replace("Her", "His");
-        fixedTitle = fixedTitle.replace("She", "He");
+        if (Configuration.OPTIONS.USE_GENDER_MALE.isEnabled()) {
+            fixedTitle = fixedTitle.replace("Her", "His");
+            fixedTitle = fixedTitle.replace("She", "He");
+        }
         int count = StringUtils.countMatches(fixedTitle, "Riles");
         if (count == 1) {
             // TODO:  Does this need to go outside the loop?  Or does it need to work on batch for the queue?
