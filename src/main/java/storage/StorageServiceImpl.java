@@ -108,9 +108,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     public static void printList(List<String> list) {
-        for (String t : list) {
-            System.out.println(t);
-        }
+        list.forEach(System.out::println);
     }
 
 }
