@@ -33,6 +33,7 @@ public class StorageServiceImpl implements StorageService {
     /**
      * Takes a string and appends it to a file
      * Duplicate lines are not appended
+     *
      * @param contents Lines to write to a file
      * @param fileName Named file which will be created where program runs
      * @throws IOException
@@ -49,7 +50,7 @@ public class StorageServiceImpl implements StorageService {
                 .forEach(line -> {
                     try {
                         FileUtils.writeStringToFile(file,
-                                System.getProperty("line.separator")+ line,
+                                line + System.getProperty("line.separator"),
                                 true);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -65,17 +66,17 @@ public class StorageServiceImpl implements StorageService {
         // TODO:  refactor using streams or something java 8?
         List<String> checkAgainst = loadFile(file);
         boolean addTheLine = true;
-            for (String check : checkAgainst) {
-                if (contents.equals(check)) {
-                    addTheLine = false;
-                }
+        for (String check : checkAgainst) {
+            if (contents.equals(check)) {
+                addTheLine = false;
             }
-            if (addTheLine &&
-                    "" != contents &&
-                    contents.length() > 10) {
-                FileUtils.writeStringToFile(file, contents + "\r\n", true);
-                logger.debug("Writing line:   " + contents);
-            }
+        }
+        if (addTheLine &&
+                "" != contents &&
+                contents.length() > 10) {
+            FileUtils.writeStringToFile(file, contents + "\r\n", true);
+            logger.debug("Writing line:   " + contents);
+        }
     }
 
     public List<String> loadFile(File file) {
