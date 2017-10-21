@@ -1,7 +1,6 @@
 package app;
 
 import api.Configuration;
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,12 +22,9 @@ public class PropertyHandler implements Configuration {
     private Properties properties = null;
 
     private PropertyHandler() throws IOException {
-        InputStream inputStream = null;
-        try {
-            properties = new java.util.Properties();
-            String propFileName = "config.properties";
-            inputStream = getClass().getClassLoader().getResourceAsStream("config/" + propFileName);
-
+        properties = new Properties();
+        String propFileName = "config.properties";
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("config/" + propFileName)) {
             if (inputStream != null) {
                 properties.load(inputStream);
             } else {
@@ -37,8 +33,6 @@ public class PropertyHandler implements Configuration {
 
         } catch (Exception e) {
             System.out.println("Exception: " + e);
-        } finally {
-            inputStream.close();
         }
     }
 

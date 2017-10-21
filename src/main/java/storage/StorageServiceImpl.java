@@ -7,8 +7,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 /**
  * Created by user on 2016-02-10.
@@ -27,27 +30,31 @@ public class StorageServiceImpl implements StorageService {
         return null;
     }
 
+    /**
+     * Takes a string and appends it to a file
+     * Duplicate lines are not appended
+     * @param contents Lines to write to a file
+     * @param fileName Named file which will be created where program runs
+     * @throws IOException
+     */
     @Override
-    public void saveFile(LinkedHashSet contents, String fileName) throws IOException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("data/" + fileName).getPath());
+    public void saveFile(List<String> contents, String fileName) throws IOException {
+        File file = new File(System.getProperty("user.dir"), fileName);
         logger.info("Writing to file: " + file.getAbsolutePath());
-        // TODO:  refactor using streams or something java 8?
-        LinkedHashSet<String> checkAgainst = loadFile(fileName);
-        boolean addTheLine = true;
-        Iterator<String> nameIter = contents.iterator();
-        while (nameIter.hasNext()) {
-            String s = nameIter.next();
-            for (String check : checkAgainst) {
-                if (s.equals(check)) {
-                    addTheLine = false;
-                }
-            }
-            if (addTheLine) {
-                FileUtils.writeStringToFile(file, s + "\r\n", true);
-                logger.debug("[Adding] " + s);
-            }
-        }
+        List<String> checkAgainst = loadFile(file);
+
+        contents.stream()
+                .filter(line -> checkAgainst.stream()
+                        .noneMatch(check -> check.equals(line)))
+                .forEach(line -> {
+                    try {
+                        FileUtils.writeStringToFile(file,
+                                System.getProperty("line.separator")+ line,
+                                true);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
     }
 
     @Override
@@ -56,7 +63,7 @@ public class StorageServiceImpl implements StorageService {
         File file = new File(classLoader.getResource("data/" + fileName).getPath());
         logger.info("Writing to file: " + file.getAbsolutePath());
         // TODO:  refactor using streams or something java 8?
-        LinkedHashSet<String> checkAgainst = loadFile(fileName);
+        List<String> checkAgainst = loadFile(file);
         boolean addTheLine = true;
             for (String check : checkAgainst) {
                 if (contents.equals(check)) {
@@ -71,40 +78,20 @@ public class StorageServiceImpl implements StorageService {
             }
     }
 
-
-    public LinkedHashSet loadFile(String fileName) throws IOException {
-        String path = "data/" + fileName;
-//        String fileContents = getFile("data/" + fileName); pretty cool stuff.. gets file contents as a String
-        return getFileLinesAsList(path);
-    }
-
-    private String getFile(String fileName){
-
-        String result = "";
-
-        ClassLoader classLoader = getClass().getClassLoader();
+    public List<String> loadFile(File file) {
         try {
-            result = IOUtils.toString(classLoader.getResourceAsStream(fileName));
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        List<String> result = null;
+        try {
+            result = IOUtils.readLines(new FileInputStream(file));
+            result = new ArrayList<>(new LinkedHashSet<>(result));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return result;
-
     }
-
-    private LinkedHashSet getFileLinesAsList(String fileName) {
-        List<String> result = null;
-        LinkedHashSet resultSet = null;
-        ClassLoader classLoader = getClass().getClassLoader();
-        try {
-            result = IOUtils.readLines(classLoader.getResourceAsStream(fileName));
-            resultSet = new LinkedHashSet(result);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return resultSet;
-    }
-
 }

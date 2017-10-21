@@ -10,9 +10,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Element;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -40,7 +42,7 @@ public class ParserServiceImpl implements ParserService, Callable<Void> {
     }
 
     @Override
-    public String parseDict(String title, LinkedHashSet names) {
+    public String parseDict(String title, List<String> names) {
         String fixedTitle = title;
         Iterator<String> nameIter = names.iterator();
         while (nameIter.hasNext()) {
@@ -72,7 +74,7 @@ public class ParserServiceImpl implements ParserService, Callable<Void> {
                 logger.info("Processing: " + data);
                 data = (Element) queue.get();
                 String title = parseTitle(data.text());
-                LinkedHashSet<String> checkAgainst = storageService.loadFile(dataFile);
+                List<String> checkAgainst = storageService.loadFile(new File(dataFile));
 //                LinkedHashSet dedupedList = new LinkedHashSet<>(checkAgainst);
                 String parsedTitle = parseDict(title, checkAgainst);
                 logger.info("Finished processing: " + parsedTitle);

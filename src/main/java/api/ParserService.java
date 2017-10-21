@@ -1,11 +1,11 @@
 package api;
 
-import java.util.LinkedHashSet;
+import java.util.List;
 
 /**
  * Created by user on 2016-02-10.
  */
 public interface ParserService {
-    public String parseTitle(String headline);
-    public String parseDict(String title, LinkedHashSet checkAgainst);
+    String parseTitle(String headline);
+    String parseDict(String title, List<String> checkAgainst);
 }
