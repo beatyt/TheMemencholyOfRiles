@@ -20,8 +20,8 @@ Edit the config.properties file to add your own url and data files.  Some data f
 ## How to deploy:
 
 1. Create a new project
-2. Git clone this into that new project directory
-3. Do the stuff for the pom.xml (mvn install????) to get the dependencies.
+2. `Git clone` this into that new project directory
+3. Do the stuff for the pom.xml `mvn install` to get the dependencies.
 4. /\\/\\e/\\/\\e
 
 ## Design patterns:
