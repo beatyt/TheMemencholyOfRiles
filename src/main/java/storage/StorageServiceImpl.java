@@ -71,7 +71,6 @@ public class StorageServiceImpl implements StorageService {
     }
 
     public List<String> loadFile(String fileName) throws IOException {
-        List<String> names = new ArrayList<String>();
         String path = "data/" + fileName;
 //        String fileContents = getFile("data/" + fileName); pretty cool stuff.. gets file contents as a String
         return getFileLinesAsList(path);
