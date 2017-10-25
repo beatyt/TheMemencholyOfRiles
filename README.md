@@ -28,3 +28,6 @@ Edit the config.properties file to add your own url and data files.  Some data f
 
 1. Singleton -- The PropertyHandler utilizes the Singleton pattern so that one instance of the configuration file will exist.  MySharedQueue uses the pattern as well.
 2. Producer-Consumer -- Multithreaded queue for the scraping and parsing.
+
+##Thanks beatyt
+This project changed my life!
