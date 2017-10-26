@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by user on 2016-02-10.
@@ -24,7 +26,9 @@ public class StorageServiceImpl implements StorageService {
     private Configuration configuration;
 
     @Inject
-    public void setConfiguration(Configuration configuration) { this.configuration = configuration; }
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     /**
      * Takes a string and appends it to a file
@@ -39,18 +43,19 @@ public class StorageServiceImpl implements StorageService {
         logger.info("Writing to file: " + file.getAbsolutePath());
         List<String> checkAgainst = retrieveEntries();
 
-        contents.stream()
+        Set<String> insertLines = contents.stream()
                 .filter(line -> checkAgainst.stream()
-                        .noneMatch(check -> check.equals(line)))
-                .forEach(line -> {
-                    try {
-                        FileUtils.writeStringToFile(file,
-                                line + System.getProperty("line.separator"),
-                                true);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+                        .noneMatch(check -> check.equals(line))).collect(Collectors.toSet());
+
+        insertLines.forEach(line -> {
+            try {
+                FileUtils.writeStringToFile(file,
+                        line + System.getProperty("line.separator"),
+                        true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public List<String> retrieveEntries() {

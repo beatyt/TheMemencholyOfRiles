@@ -35,6 +35,8 @@ public class StorageServiceImplTest {
     @Before
     public void setUp() throws Exception {
         Mockito.when(configuration.getValue("saveToFileName")).thenReturn("testFile.txt");
+        File file = new File(System.getProperty("user.dir"), configuration.getValue("saveToFileName"));
+        file.delete();
     }
 
     @Test
