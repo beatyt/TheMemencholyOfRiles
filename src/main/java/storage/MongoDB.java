@@ -1,4 +1,4 @@
-package main.java.storage;
+package storage;
 
 import com.mongodb.MongoClient;
 

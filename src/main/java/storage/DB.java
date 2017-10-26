@@ -1,4 +1,4 @@
-package main.java.storage;
+package storage;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

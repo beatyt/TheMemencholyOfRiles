@@ -1,116 +1,78 @@
-package main.java.storage;
+package storage;
 
-import main.java.api.StorageService;
+import api.Configuration;
+import api.StorageService;
+import com.google.inject.Inject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by user on 2016-02-10.
  */
 public class StorageServiceImpl implements StorageService {
-    private static final Logger logger = LogManager.getLogger(StorageServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(StorageServiceImpl.class);
 
+    private Configuration configuration;
 
-    @Override
-    public void storeEntry(String entry) {
-        System.out.println(entry);
+    @Inject
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
     }
 
+    /**
+     * Takes a string and appends it to a file
+     * Duplicate lines are not appended
+     *
+     * @param contents Lines to write to a file
+     * @throws IOException
+     */
     @Override
-    public String retrieveEntry() {
-        return null;
-    }
-
-    @Override
-    public void saveFile(List<String> contents, String fileName) throws IOException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("data/" + fileName).getPath());
+    public void storeEntry(List<String> contents) throws IOException {
+        File file = new File(System.getProperty("user.dir"), configuration.getValue("saveToFileName"));
         logger.info("Writing to file: " + file.getAbsolutePath());
-        // TODO:  refactor using streams or something java 8?
-        List<String> checkAgainst = loadFile(fileName);
-        boolean addTheLine = true;
-        for (String s : contents) {
-            for (String check : checkAgainst) {
-                if (s.equals(check)) {
-                    addTheLine = false;
-                }
+        List<String> checkAgainst = retrieveEntries();
+
+        Set<String> insertLines = contents.stream()
+                .filter(line -> checkAgainst.stream()
+                        .noneMatch(check -> check.equals(line))).collect(Collectors.toSet());
+
+        insertLines.forEach(line -> {
+            try {
+                FileUtils.writeStringToFile(file,
+                        line + System.getProperty("line.separator"),
+                        true);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            if (addTheLine) {
-                FileUtils.writeStringToFile(file, s + "\r\n", true);
-                logger.debug("[Adding] " + s);
-            }
-        }
-//        printList(contents);
+        });
     }
 
-    @Override
-    public void appendLineToFile(String contents, String fileName) throws IOException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("data/" + fileName).getPath());
-        logger.info("Writing to file: " + file.getAbsolutePath());
-        // TODO:  refactor using streams or something java 8?
-        List<String> checkAgainst = loadFile(fileName);
-        boolean addTheLine = true;
-            for (String check : checkAgainst) {
-                if (contents.equals(check)) {
-                    addTheLine = false;
-                }
-            }
-            if (addTheLine) {
-                FileUtils.writeStringToFile(file, contents + "\r\n", true);
-                logger.debug("[Adding] " + contents);
-            }
-//        printList(contents);
-    }
-
-    public List<String> loadFile(String fileName) throws IOException {
-        List<String> names = new ArrayList<String>();
-        String path = "data/" + fileName;
-//        String fileContents = getFile("data/" + fileName); pretty cool stuff.. gets file contents as a String
-        return getFileLinesAsList(path);
-    }
-
-    private String getFile(String fileName){
-
-        String result = "";
-
-        ClassLoader classLoader = getClass().getClassLoader();
+    public List<String> retrieveEntries() {
+        File file = new File(System.getProperty("user.dir"), configuration.getValue("saveToFileName"));
         try {
-            result = IOUtils.toString(classLoader.getResourceAsStream(fileName));
+            file.createNewFile(); // does nothing if the file already exists
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return result;
-
-    }
-
-    private List<String> getFileLinesAsList(String fileName){
-
         List<String> result = null;
-
-        ClassLoader classLoader = getClass().getClassLoader();
         try {
-            result = IOUtils.readLines(classLoader.getResourceAsStream(fileName));
+            result = IOUtils.readLines(new FileInputStream(file));
+            result = new ArrayList<>(new LinkedHashSet<>(result));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return result;
-
     }
-
-    public static void printList(List<String> list) {
-        for (String t : list) {
-            System.out.println(t);
-        }
-    }
-
 }

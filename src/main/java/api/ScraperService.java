@@ -1,6 +1,4 @@
-package main.java.api;
-
-import org.jsoup.select.Elements;
+package api;
 
 import java.io.IOException;
 
@@ -8,5 +6,5 @@ import java.io.IOException;
  * Created by user on 2016-02-10.
  */
 public interface ScraperService {
-    public Elements fetchContent(String url, String pattern) throws IOException;
+    void call() throws IOException, InterruptedException;
 }

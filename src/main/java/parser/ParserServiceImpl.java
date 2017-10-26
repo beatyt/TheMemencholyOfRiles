@@ -1,85 +1,77 @@
-package main.java.parser;
+package parser;
 
+import api.Configuration;
+import api.ParserService;
+import api.StorageService;
 import com.google.inject.Inject;
-import main.java.api.ParserService;
-import main.java.api.StorageService;
-import main.java.app.MySharedQueue;
-import main.java.app.PropertyHandler;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * Created by user on 2016-02-10.
  */
-public class ParserServiceImpl implements ParserService, Callable<Void> {
-    private static final Logger logger = LogManager.getLogger(ParserServiceImpl.class);
-    private StorageService storageService;
+public class ParserServiceImpl implements ParserService {
+    private static final Logger logger = LoggerFactory.getLogger(ParserServiceImpl.class);
+
+    final private StorageService storageService;
+    final private Configuration configuration;
 
     @Inject
-    public void setStorage(StorageService storageService) {
+    public ParserServiceImpl(StorageService storageService, Configuration configuration) {
         this.storageService = storageService;
+        this.configuration = configuration;
     }
 
-    @Inject
-    private MySharedQueue queue;
-
-    public String parseTitle(String headline) {
-        String title = headline.replace("Permalink", "");
-        if (!"".equals(title)) {
-            return title;
+    String parseTitle(String headline) {
+        List<String> deletions = Arrays.asList(configuration.getValue("deleteTags").split(","));
+        for (String deletion : deletions) {
+            headline = headline.replace(deletion, "");
+        }
+        if (!"".equals(headline)) {
+            return headline.trim();
         }
         return null;
     }
-    public String parseDict(String title, List<String> names) {
+
+    String parseDict(String title, List<String> names) {
         String fixedTitle = title;
-            for (String name : names) {
+        for (String name : names) {
+            if (Configuration.OPTIONS.REPLACE_NAME_ONCE.isEnabled()) {
                 // Quit once we find one match
                 if (fixedTitle.contains(name)) {
-                    fixedTitle = fixedTitle.replaceFirst(name, "Riles");
+                    fixedTitle = fixedTitle.replaceFirst(name, configuration.getValue("replaceWithName"));
                     break;
                 }
+            }
         }
-        fixedTitle = fixedTitle.replace("Her", "His");
-        fixedTitle = fixedTitle.replace("She", "He");
-        int count = StringUtils.countMatches(fixedTitle, "Riles");
-        if (count == 1) {
-            // TODO:  Does this need to go outside the loop?  Or does it need to work on batch for the queue?
-            return fixedTitle;
+        if (Configuration.OPTIONS.USE_GENDER_MALE.isEnabled()) {
+            fixedTitle = fixedTitle.replace("Her", "His");
+            fixedTitle = fixedTitle.replace("She", "He");
         }
-        return null;
+        if (Configuration.OPTIONS.REPLACE_NAME_ONCE.isEnabled()) {
+            int count = StringUtils.countMatches(fixedTitle, "Riles");
+            if (count == 1) {
+                return fixedTitle;
+            }
+        }
+        return fixedTitle;
     }
 
     @Override
-    public Void call() throws Exception {
-        String dataFile = PropertyHandler.getInstance().getValue("dataFile");
-        try {
-            Element data = (Element) queue.get();
-            while (queue.continueProducing || data != null) {
-                data = (Element) queue.get();
-                String title = parseTitle(data.text());
-                List<String> checkAgainst = storageService.loadFile(dataFile);
-                List<String> dedupedList =
-                        new ArrayList<>(new LinkedHashSet<>(checkAgainst));
-                String parsedTitle = parseDict(title, dedupedList);
-                logger.info("Finished processing: " + parsedTitle);
-//                storageService.storeEntry(parsedTitle);
-                storageService.appendLineToFile(parsedTitle, "Riles.txt");
-//                System.out.println("Consumer processed: " + parsedTitle);
-                Thread.sleep(100);
-            }
-            System.out.println("Consumer is done.");
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
-        return null;
+    public void call(String headline) throws IOException {
+        String title = parseTitle(headline);
+        logger.info("Processing: " + title);
+        List<String> checkAgainst = storageService.retrieveEntries();
+        String parsedTitle = parseDict(title, checkAgainst);
+        logger.info("Finished processing: " + parsedTitle);
+        storageService.storeEntry(Collections.singletonList(parsedTitle));
+        logger.info("Consumer is done.");
+
     }
 }

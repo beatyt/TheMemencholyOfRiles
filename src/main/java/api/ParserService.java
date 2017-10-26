@@ -1,13 +1,11 @@
-package main.java.api;
+package api;
 
-import org.jsoup.select.Elements;
-
-import java.util.List;
+import java.io.IOException;
 
 /**
  * Created by user on 2016-02-10.
  */
 public interface ParserService {
-    public String parseTitle(String headline);
-    public String parseDict(String title, List<String> checkAgainst);
+
+    void call(String headline) throws IOException;
 }

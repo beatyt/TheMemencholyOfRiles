@@ -1,34 +1,31 @@
-package main.java.app;
+package app;
 
-import main.java.api.ParserService;
-import main.java.api.ScraperService;
-import main.java.api.StorageService;
+import api.Configuration;
+import api.ParserService;
+import api.ScraperService;
+import api.StorageService;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import main.java.storage.StorageServiceImpl;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jsoup.select.Elements;
-import main.java.parser.ParserServiceImpl;
-import main.java.scraper.ScraperServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import parser.ParserServiceImpl;
+import scraper.ScraperServiceImpl;
+import storage.StorageServiceImpl;
 
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Collections;
+import java.util.LinkedList;
 
 /**
  * Created by user on 2016-02-10.
  */
 
 public class Module extends AbstractModule {
-    private static final Logger logger = LogManager.getLogger(Module.class);
+    private static final Logger logger = LoggerFactory.getLogger(Module.class);
     private ScraperService scraperService;
     private ParserService parserService;
     private StorageService storageService;
+    private Configuration configuration;
 
     @Inject
     public void setScraper(ScraperService scraperService) {
@@ -42,27 +39,30 @@ public class Module extends AbstractModule {
     public void setStorage(StorageService storageService) {
         this.storageService = storageService;
     }
+    @Inject
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     @Override
     protected void configure() {
         bind(ParserService.class).to(ParserServiceImpl.class);
         bind(ScraperService.class).to(ScraperServiceImpl.class);
         bind(StorageService.class).to(StorageServiceImpl.class);
+        bind(Configuration.class).to(PropertyHandler.class);
     }
 
-    public void theThing() throws IOException, InterruptedException {
-
-        String saveToFileName = PropertyHandler.getInstance().getValue("saveToFileName");
-
-        BlockingQueue sharedQueue = new LinkedBlockingQueue();
-
+    void start() {
+        new Thread(() -> {
+            try {
+                scraperService.call();
+            } catch (InterruptedException | IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
-    public void copyToClipboard(String toCopy) {
-        StringSelection stringSelection = new StringSelection(toCopy);
-        Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clpbrd.setContents(stringSelection, null);
-    }
+
 
     public java.util.List<String> pickNRandom(java.util.List<String> lst, int n) {
         java.util.List<String> copy = new LinkedList<String>(lst);
