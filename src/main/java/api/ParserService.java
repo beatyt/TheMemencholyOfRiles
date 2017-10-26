@@ -1,11 +1,11 @@
 package api;
 
-import java.util.List;
+import java.io.IOException;
 
 /**
  * Created by user on 2016-02-10.
  */
 public interface ParserService {
-    String parseTitle(String headline);
-    String parseDict(String title, List<String> checkAgainst);
+
+    void call(String headline) throws IOException;
 }

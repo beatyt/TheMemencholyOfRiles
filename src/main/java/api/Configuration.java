@@ -6,6 +6,7 @@ package api;
 public interface Configuration {
 
     enum OPTIONS {
+        REPLACE_NAME_ONCE,
         USE_GENDER_MALE,
         USE_GENDER_FEMALE;
 

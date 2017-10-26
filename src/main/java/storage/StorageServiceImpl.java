@@ -1,10 +1,12 @@
 package storage;
 
+import api.Configuration;
 import api.StorageService;
+import com.google.inject.Inject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,32 +19,25 @@ import java.util.List;
  * Created by user on 2016-02-10.
  */
 public class StorageServiceImpl implements StorageService {
-    private static final Logger logger = LogManager.getLogger(StorageServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(StorageServiceImpl.class);
 
+    private Configuration configuration;
 
-    @Override
-    public void storeEntry(String entry) {
-        System.out.println(entry);
-    }
-
-    @Override
-    public String retrieveEntry() {
-        return null;
-    }
+    @Inject
+    public void setConfiguration(Configuration configuration) { this.configuration = configuration; }
 
     /**
      * Takes a string and appends it to a file
      * Duplicate lines are not appended
      *
      * @param contents Lines to write to a file
-     * @param fileName Named file which will be created where program runs
      * @throws IOException
      */
     @Override
-    public void saveFile(List<String> contents, String fileName) throws IOException {
-        File file = new File(System.getProperty("user.dir"), fileName);
+    public void storeEntry(List<String> contents) throws IOException {
+        File file = new File(System.getProperty("user.dir"), configuration.getValue("saveToFileName"));
         logger.info("Writing to file: " + file.getAbsolutePath());
-        List<String> checkAgainst = loadFile(file);
+        List<String> checkAgainst = retrieveEntries();
 
         contents.stream()
                 .filter(line -> checkAgainst.stream()
@@ -58,30 +53,10 @@ public class StorageServiceImpl implements StorageService {
                 });
     }
 
-    @Override
-    public void appendLineToFile(String contents, String fileName) throws IOException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("data/" + fileName).getPath());
-        logger.info("Writing to file: " + file.getAbsolutePath());
-        // TODO:  refactor using streams or something java 8?
-        List<String> checkAgainst = loadFile(file);
-        boolean addTheLine = true;
-        for (String check : checkAgainst) {
-            if (contents.equals(check)) {
-                addTheLine = false;
-            }
-        }
-        if (addTheLine &&
-                "" != contents &&
-                contents.length() > 10) {
-            FileUtils.writeStringToFile(file, contents + "\r\n", true);
-            logger.debug("Writing line:   " + contents);
-        }
-    }
-
-    public List<String> loadFile(File file) {
+    public List<String> retrieveEntries() {
+        File file = new File(System.getProperty("user.dir"), configuration.getValue("saveToFileName"));
         try {
-            file.createNewFile();
+            file.createNewFile(); // does nothing if the file already exists
         } catch (IOException e) {
             e.printStackTrace();
         }
