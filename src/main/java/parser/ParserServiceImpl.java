@@ -4,10 +4,13 @@ import api.Configuration;
 import api.ParserService;
 import api.StorageService;
 import com.google.inject.Inject;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -67,11 +70,17 @@ public class ParserServiceImpl implements ParserService {
     public void call(String headline) throws IOException {
         String title = parseTitle(headline);
         logger.info("Processing: " + title);
-        List<String> checkAgainst = storageService.retrieveEntries();
+        List<String> checkAgainst = loadReplaceNames();
         String parsedTitle = parseDict(title, checkAgainst);
         logger.info("Finished processing: " + parsedTitle);
         storageService.storeEntry(Collections.singletonList(parsedTitle));
         logger.info("Consumer is done.");
 
+    }
+
+    private List<String> loadReplaceNames() throws IOException {
+        File file = new File(System.getProperty("user.dir"), configuration.getValue("namesToReplace"));
+        file.createNewFile();
+        return IOUtils.readLines(new FileInputStream(file));
     }
 }

@@ -95,8 +95,8 @@ public class StartupHandler extends Application {
                 logger.info("Copying random line from: " + dataFile.getAbsoluteFile());
                 contents = FileUtils.readFileToString(dataFile);
                 if (!dataFile.exists()) {
-                    logger.info("The dataFile was not found.");
-                    errMsg.setText("The dataFile was not found.");
+                    logger.info("The namesToReplace was not found.");
+                    errMsg.setText("The namesToReplace was not found.");
                 } else {
                     String lines = "";
                     String[] linesInFile = contents.split("\r\n");
