@@ -80,6 +80,7 @@ public class ParserServiceImpl implements ParserService {
 
     private List<String> loadReplaceNames() throws IOException {
         File file = new File(System.getProperty("user.dir"), configuration.getValue("namesToReplace"));
+        file.createNewFile();
         return IOUtils.readLines(new FileInputStream(file));
     }
 }

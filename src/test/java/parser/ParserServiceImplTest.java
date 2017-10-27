@@ -44,6 +44,7 @@ public class ParserServiceImplTest {
     public void setup() throws Exception {
         Mockito.when(configuration.getValue("deleteTags")).thenReturn("Permalink");
         Mockito.when(configuration.getValue("replaceWithName")).thenReturn("Riles");
+        Mockito.when(configuration.getValue("namesToReplace")).thenReturn("celeb-names");
         Mockito.when(queue.get()).thenReturn(element);
         queue.continueProducing = true;
         Mockito.when(element.text()).thenReturn("123");
